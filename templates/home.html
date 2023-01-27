@@ -1,0 +1,24 @@
+<html lang="en">
+  <head>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"
+          rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h3 class="text-muted">Virtual Tryon Demo</h3>
+      </div>
+      <hr/>
+      <div>
+      
+      <form action="upload" method="post" enctype="multipart/form-data">
+        <h4 class="text-muted">Target Person Image</h4>
+        <input type="file" name="personImage" ><br />
+        <h4 class="text-muted">Cloth Image</h4>
+        <input type="file" name="clothImage"><br /><br />
+        <input type="submit" value="generateTryonImage">
+      </form>
+      </div>
+    </div>
+  </body>
+</html>

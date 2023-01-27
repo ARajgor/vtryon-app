@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Virtual Tryon Demo</title>
+</head>
+<body>
+{#    <img src="../result/TOM/test/try-on/000501_0.jpg" alt="Result Image">#}
+	<img src="{{ url_for('static', filename="data/test/image/"+user_image) }}" />
+    <h3>uploaded image </h3>
+{#    <img src="{{ user_image }}" alt="Result Image">#}
+	<img src="{{ url_for('static', filename="result/TOM/test/try-on/"+user_image) }}" />
+</body>
+</html>

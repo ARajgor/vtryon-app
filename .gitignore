@@ -1,0 +1,11 @@
+*__pycache__*
+*.pth
+*.caffemodel
+tensorboard/*
+log/*
+*.sh
+.idea/
+.idea/*
+*.pyc
+*.zip
+venv
