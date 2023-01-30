@@ -167,8 +167,8 @@ def test_tom(opt, test_loader, model, board):
         # outputs = model(torch.cat([agnostic, c], 1))  # CP-VTON
         outputs = model(torch.cat([agnostic, c, cm], 1))  # CP-VTON+
         p_rendered, m_composite = torch.split(outputs, 3, 1)
-        p_rendered = F.tanh(p_rendered)
-        m_composite = F.sigmoid(m_composite)
+        p_rendered = torch.tanh(p_rendered)
+        m_composite = torch.sigmoid(m_composite)
         p_tryon = c * m_composite + p_rendered * (1 - m_composite)
 
         visuals = [[im_h, shape, im_pose],

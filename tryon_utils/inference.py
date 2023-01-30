@@ -154,7 +154,7 @@ def inference(net, img_path='', output_path='./', output_name='f', use_gpu=True)
             outputs = outputs.unsqueeze(0)
 
             if iii > 0:
-                outputs = F.upsample(outputs, size=(h, w), mode='bilinear', align_corners=True)
+                outputs = torch.nn.functional.interpolate(outputs, size=(h, w), mode='bilinear', align_corners=True)
                 outputs_final = outputs_final + outputs
             else:
                 outputs_final = outputs.clone()
