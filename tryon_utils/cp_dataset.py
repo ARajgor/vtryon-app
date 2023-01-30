@@ -146,7 +146,7 @@ class CPDataset(data.Dataset):
         im_h = im * phead - (1 - phead)  # [-1,1], fill -1 for other parts
 
         # load pose points
-        pose_name = im_name.replace('.jpg', '_keypoints.json')
+        pose_name = im_name.split('.')[0]+ "_keypoints.json"
         with open(osp.join(self.data_path, 'pose', pose_name), 'r') as f:
             pose_label = json.load(f)
             pose_data = pose_label['people'][0]['pose_keypoints']
@@ -253,6 +253,7 @@ if __name__ == "__main__":
     opt = parser.parse_args()
     dataset = CPDataset(opt)
     data_loader = CPDataLoader(opt, dataset)
+    print(f"dataset:{dataset}, data_loader:{data_loader} ")
 
     print('Size of the dataset: %05d, dataloader: %04d'
           % (len(dataset), len(data_loader.data_loader)))

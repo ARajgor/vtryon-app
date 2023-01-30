@@ -106,7 +106,7 @@ def generate_pose_keypoints(img_file):
         }]}
     
     # write json file
-    json_file = img_file.split('.jpg')[0] + "_keypoints.json" 
+    json_file = img_file.split('.')[0] + "_keypoints.json"
     with open("data/test/pose/"+ json_file, 'w') as outfile:
         json.dump(json_data, outfile)
     return "written keypoints json file"

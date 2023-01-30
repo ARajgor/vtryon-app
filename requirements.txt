@@ -1,16 +1,10 @@
-# Library dependencies for the python code.  You need to install these with
-# First run: conda install pytorch=0.4.1 torchvision=0.2.1 -c pytorch
-# Next `pip install -r requirements.txt` before you can run this.
-#
-
-Flask==1.1.1
-gunicorn==19.9.0
-itsdangerous==1.1.0
-Jinja2==2.10.1
-MarkupSafe==1.1.1
-Werkzeug==0.15.5
-tensorboardX
-pillow
-numpy
-opencv-contrib-python
-networkx
+Flask==2.2.2
+networkx==3.0
+numpy==1.24.1
+opencv-python==4.5.5.64
+Pillow==9.4.0
+scipy==1.10.0
+tensorboardX==2.5.1
+torch==1.13.1
+torchvision==0.14.1
+Werkzeug==2.2.2

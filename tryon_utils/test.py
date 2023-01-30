@@ -98,9 +98,9 @@ def test_gmm(opt, test_loader, model, board):
         shape_ori = inputs['shape_ori']  # original body shape without blurring
 
         grid, theta = model(agnostic, cm)
-        warped_cloth = F.grid_sample(c, grid, padding_mode='border')
-        warped_mask = F.grid_sample(cm, grid, padding_mode='zeros')
-        warped_grid = F.grid_sample(im_g, grid, padding_mode='zeros')
+        warped_cloth = F.grid_sample(c, grid, padding_mode='border', align_corners=True)
+        warped_mask = F.grid_sample(cm, grid, padding_mode='zeros', align_corners=True)
+        warped_grid = F.grid_sample(im_g, grid, padding_mode='zeros', align_corners=True)
         overlay = 0.7 * warped_cloth + 0.3 * im
 
         visuals = [[im_h, shape, im_pose],

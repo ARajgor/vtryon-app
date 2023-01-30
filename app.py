@@ -14,7 +14,7 @@ from tryon_utils.image_mask import make_body_mask
 
 app = Flask(__name__)
 app.config['DATABASE'] = 'database/'
-app.config['ALLOWED_EXTENSIONS'] = set(['png', 'jpg', 'jpeg'])
+app.config['ALLOWED_EXTENSIONS'] = set(['png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG'])
 
 # check extensions
 def allowed_file(filename):
@@ -27,14 +27,15 @@ def index():
 
 @app.route('/upload', methods=['POST'])
 def upload():
+    t = time.time()
     # Uploaded Person and Cloth Images
     file_person = request.files['personImage']
     file_cloth = request.files['clothImage']
     print("file_person, file_cloth:", file_person, file_cloth)
     
     if file_person and allowed_file(file_person.filename) and file_cloth and allowed_file(file_cloth.filename):
-        filename_person = secure_filename(file_person.filename)
-        filename_cloth = secure_filename(file_cloth.filename)
+        filename_person = secure_filename(file_person.filename).lower()
+        filename_cloth = secure_filename(file_cloth.filename).lower()
         # save images
         file_person.save(os.path.join("data/test/image/", filename_person))
         file_cloth.save(os.path.join("data/test/cloth/", filename_cloth))
@@ -51,7 +52,7 @@ def upload():
         # save resized cloth image
         cv2.imwrite("data/test/cloth/"+ filename_cloth, cloth_resize)
 
-        shutil.copyfile("data/test/image/"+filename_person, "static/data/test/image/"+filename_person)
+        shutil.copyfile("data/test/image/"+filename_person, "static/original/"+filename_person)
         
         # ..... Cloth Masking ..... #
         image_path = "data/test/cloth/" + filename_cloth
@@ -94,6 +95,7 @@ def upload():
         # ..... Run Try-on Module(TOM) Model ..... #
         cmd_tom = "python tryon_utils/test.py --name TOM --stage TOM --workers 4 --datamode test --data_list test_samples_pair.txt --checkpoint tryon_utils/checkpoints/TOM/tom_final.pth"
         subprocess.call(cmd_tom, shell=True)
+        print("Total time: ", time.time() - t )
         return render_template('result.html', user_image=filename_person)
 
 
