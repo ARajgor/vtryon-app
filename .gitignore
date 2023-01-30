@@ -3,6 +3,7 @@
 *.caffemodel
 tensorboard/*
 log/*
+d.py
 static/original/*
 *.sh
 .idea/
@@ -10,3 +11,4 @@ static/original/*
 *.pyc
 *.zip
 venv
+.gitignore

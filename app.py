@@ -52,6 +52,7 @@ def upload():
         # save resized cloth image
         cv2.imwrite("data/test/cloth/"+ filename_cloth, cloth_resize)
 
+        #move original image to static/original folder for showing on result.html
         shutil.copyfile("data/test/image/"+filename_person, "static/original/"+filename_person)
         
         # ..... Cloth Masking ..... #
@@ -85,7 +86,7 @@ def upload():
         subprocess.call(cmd_gmm, shell=True)
         #time.sleep(10)
         # move generated files to data/test/
-        # result/GMM/test/warp-cloth/004325_1.jpg
+        # static/result/GMM/test/warp-cloth/004325_1.jpg
         warp_cloth = "static/result/GMM/test/warp-cloth/" + filename_person
         warp_mask = "static/result/GMM/test/warp-mask/" + filename_person
         shutil.copyfile(warp_cloth, "data/test/warp-cloth/"+ filename_person)
@@ -100,5 +101,5 @@ def upload():
 
 
 if __name__ == "__main__":
-    app.run(host='127.0.0.1',port=5001)
+    app.run(host='127.0.0.1',port=5000)
     
