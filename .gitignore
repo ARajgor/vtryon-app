@@ -3,8 +3,6 @@
 *.caffemodel
 tensorboard/*
 log/*
-d.py
-static/original/*
 *.sh
 .idea/
 .idea/*
