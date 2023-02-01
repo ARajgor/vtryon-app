@@ -5,7 +5,7 @@ import os
 import shutil
 import subprocess
 import time
-from cv2 import cv2
+import cv2
 
 ## from custom py files
 from tryon_utils.openpose_json import generate_pose_keypoints
