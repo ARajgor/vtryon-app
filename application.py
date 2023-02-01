@@ -12,20 +12,20 @@ from tryon_utils.openpose_json import generate_pose_keypoints
 from tryon_utils.cloth_mask import cloth_masking
 from tryon_utils.image_mask import make_body_mask
 
-app = Flask(__name__)
-app.config['DATABASE'] = 'database/'
-app.config['ALLOWED_EXTENSIONS'] = set(['png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG'])
+application = Flask(__name__)
+application.config['DATABASE'] = 'database/'
+application.config['ALLOWED_EXTENSIONS'] = set(['png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG'])
 
 # check extensions
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
+    return '.' in filename and filename.rsplit('.', 1)[1] in application.config['ALLOWED_EXTENSIONS']
     
-@app.route('/')
+@application.route('/')
 def index():
     return render_template('home.html')
 
 
-@app.route('/upload', methods=['POST'])
+@application.route('/upload', methods=['POST'])
 def upload():
     t = time.time()
     # Uploaded Person and Cloth Images
@@ -101,5 +101,5 @@ def upload():
 
 
 if __name__ == "__main__":
-    app.run(host='127.0.0.1',port=5000)
+    application.run(host='127.0.0.1',port=5000)
     
