@@ -62,7 +62,7 @@ def upload():
         
         
         # ..... Image parser ..... # 
-        cmd_parse = "python tryon_utils/inference.py --loadmodel tryon_utils/checkpoints/inference.pth --img_path " + filename_person + " --output_path img/ --output_name "+ filename_person
+        cmd_parse = "python tryon_utils/inference.py --loadmodel tryon_utils/checkpoints/inference.pth --img_path " + filename_person + " --output_name "+ filename_person
         subprocess.call(cmd_parse, shell=True)
         
         
@@ -101,5 +101,5 @@ def upload():
 
 
 if __name__ == "__main__":
-    application.run(host='127.0.0.1',port=5000)
+    application.run(host='0.0.0.0',port=5000)
     

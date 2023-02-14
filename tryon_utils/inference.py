@@ -99,7 +99,7 @@ def inference(net, img_path='', output_path='./', output_name='f', use_gpu=True)
     adj2_test = adj2_.unsqueeze(0).unsqueeze(0).expand(1, 1, 7, 20).cpu().transpose(2, 3)
 
     adj1_ = Variable(torch.from_numpy(graph.preprocess_adj(graph.pascal_graph)).float())
-    adj3_test = adj1_.unsqueeze(0).unsqueeze(0).expand(1, 1, 7, 7).cpu(3)
+    adj3_test = adj1_.unsqueeze(0).unsqueeze(0).expand(1, 1, 7, 7).cpu()
 
     cihp_adj = graph.preprocess_adj(graph.cihp_graph)
     adj3_ = Variable(torch.from_numpy(cihp_adj).float())
@@ -164,10 +164,10 @@ def inference(net, img_path='', output_path='./', output_name='f', use_gpu=True)
     vis_res = decode_labels(results)
 
     parsing_im = Image.fromarray(vis_res[0])
-    parsing_im.save(os.path.join("data/test/image-parse/"+'{}'.format(output_name).replace(".jpg", ".png")))
+    parsing_im.save(os.path.join("data/test/image-parse/",'{}'.format(output_name).replace(".jpg", ".png")))
     #print("output img parse:", output_name)
     # gray image pasre
-    cv2.imwrite(os.path.join("data/test/image-parse-new/"+'{}'.format(output_name).replace(".jpg", ".png")), results[0, :, :])
+    cv2.imwrite(os.path.join("data/test/image-parse-new/",'{}'.format(output_name).replace(".jpg", ".png")), results[0, :, :])
 
     end_time = timeit.default_timer()
     print('time used for the multi-scale image inference' + ' is :' + str(end_time - start_time))

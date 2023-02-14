@@ -6,8 +6,8 @@ import argparse
 import json 
 
 #image1 = cv2.imread("000010_0.jpg")
-protoFile = "tryon_utils\\checkpoints\\openpose_pose_coco.prototxt"
-weightsFile = "tryon_utils\\checkpoints\\pose_iter_440000.caffemodel"
+protoFile = "tryon_utils/checkpoints/openpose_pose_coco.prototxt"
+weightsFile = "tryon_utils/checkpoints/pose_iter_440000.caffemodel"
 nPoints = 18
 
 # COCO Output Format
