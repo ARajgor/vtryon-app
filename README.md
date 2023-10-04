@@ -2,8 +2,7 @@
 
 Flask App version of https://github.com/minar09/cp-vton-plus
 
-**Master branch is for cuda based version,
-cpu branch is for cpu based version.**
+**This is CPU based version.**
 
 if you find any problem feel free to raise issue.
 
@@ -18,9 +17,6 @@ if you find any problem feel free to raise issue.
 - showing both images on result page. original and result.
 
 ### Installation
-
-**For cuda version (GPU), install torch with cuda [Here.](https://1drv.ms/u/s!Ai8t8GAHdzVUiQA-o3C7cnrfGN6O?e=EaRiFP)**
-**Remove torch and torchvision from requirements.txt and install it manually.**
 
 `pip install -r requirements.txt`
 
