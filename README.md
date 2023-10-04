@@ -22,7 +22,27 @@ if you find any problem feel free to raise issue.
 
 `python application.py`
 
+### Input and result image folder structure
 
+```
+├── static
+│   ├── data
+│   │   ├── input
+│   │   │   ├── cloth
+│   │   │   ├── cloth-mask
+│   │   │   ├── image
+│   │   │   ├── image-mask
+│   │   │   ├── image-parse
+│   │   │   ├── image-parse-new
+│   │   │   ├── pose
+│   │   │   ├── warp-cloth
+│   │   │   ├── warp-mask
+│   │   ├── grid.png
+│   │   ├── test_sample_pair.txt
+│   └── result (Auto generated)
+│       ├── TOM 
+│       ├── GMM
+```
 ### Pretrained Models
 
 Download the these models and paste in folder "tryon_utils/checkpoints/"
