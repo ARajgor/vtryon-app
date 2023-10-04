@@ -5,7 +5,7 @@ import torch.nn.functional as F
 import torch.utils.model_zoo as model_zoo
 from torch.nn.parameter import Parameter
 from collections import OrderedDict
-from sync_batchnorm import SynchronizedBatchNorm1d, DataParallelWithCallback, SynchronizedBatchNorm2d
+from tryon_utils.sync_batchnorm import SynchronizedBatchNorm1d, DataParallelWithCallback, SynchronizedBatchNorm2d
 
 
 def fixed_padding(inputs, kernel_size, rate):

@@ -2,12 +2,9 @@
 Make updated body shape from updated segmentation
 """
 
-import os
 import numpy as np
 import cv2
-from PIL import Image
 import sys
-
 
 (cv_major, _, _) = cv2.__version__.split(".")
 if cv_major != '4' and cv_major != '3':
@@ -35,26 +32,19 @@ def body_detection(image, seg_mask):
     return mask
 
 
-def make_body_mask(img_file, seg_file):
+def make_body_mask(base_dir, img_file):
 
-    # Load images
-    img_dir = "data/test/image/"
-    img = cv2.imread(img_dir + img_file) # image/***.png
-    # segm = Image.open(seg_pth)
-    # the png file should be 1-ch but it is 3 ch ^^;
-    
-    #image parse new folder
-    seg_dir = "data/test/image-parse-new/"
-    #seg_file = "/home/vinod/D2B/tryon_api/data/test/image-parse-new/000010_0.png"
-    gray = cv2.imread(seg_dir + seg_file, cv2.IMREAD_GRAYSCALE)
+    img = cv2.imread(base_dir + '/image/' + img_file)  # image/***.png
+
+    # image parse new folder
+    seg_file = img_file.replace(".jpg", ".png")
+    gray = cv2.imread(base_dir + '/image-parse-new/' + seg_file, cv2.IMREAD_GRAYSCALE)
     _, seg_mask = cv2.threshold(gray, 1, 255, cv2.THRESH_BINARY)
 
     body_mask = body_detection(img, seg_mask)
     body_mask = body_mask + seg_mask
     body_mask[seg_mask] = 1
-    
+
     # write image mask
-    mask_path = "data/test/image-mask/" + img_file.replace(".jpg", ".png")
+    mask_path = base_dir + "/image-mask/" + img_file.replace(".jpg", ".png")
     cv2.imwrite(mask_path, body_mask)
-    return True    
-    

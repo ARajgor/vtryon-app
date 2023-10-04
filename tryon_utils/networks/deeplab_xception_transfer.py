@@ -7,17 +7,18 @@ from torch.nn.parameter import Parameter
 import numpy as np
 from collections import OrderedDict
 from torch.nn import Parameter
-from networks import deeplab_xception,gcn, deeplab_xception_synBN
+from . import deeplab_xception, gcn, deeplab_xception_synBN
 import pdb
+
 
 #######################
 # base model
 #######################
 
 class deeplab_xception_transfer_basemodel(deeplab_xception.DeepLabv3_plus):
-    def __init__(self,nInputChannels=3, n_classes=7, os=16,input_channels=256,hidden_layers=128,out_channels=256):
+    def __init__(self, nInputChannels=3, n_classes=7, os=16, input_channels=256, hidden_layers=128, out_channels=256):
         super(deeplab_xception_transfer_basemodel, self).__init__(nInputChannels=nInputChannels, n_classes=n_classes,
-                                                                  os=os,)
+                                                                  os=os, )
         ### source graph
         # self.source_featuremap_2_graph = gcn.Featuremaps_to_Graph(input_channels=input_channels, hidden_layers=hidden_layers,
         #                                                    nodes=n_classes)
@@ -32,19 +33,20 @@ class deeplab_xception_transfer_basemodel(deeplab_xception.DeepLabv3_plus):
         #                                  nn.ReLU(True)])
 
         ### target graph
-        self.target_featuremap_2_graph = gcn.Featuremaps_to_Graph(input_channels=input_channels, hidden_layers=hidden_layers,
-                                                           nodes=n_classes)
+        self.target_featuremap_2_graph = gcn.Featuremaps_to_Graph(input_channels=input_channels,
+                                                                  hidden_layers=hidden_layers,
+                                                                  nodes=n_classes)
         self.target_graph_conv1 = gcn.GraphConvolution(hidden_layers, hidden_layers)
         self.target_graph_conv2 = gcn.GraphConvolution(hidden_layers, hidden_layers)
         self.target_graph_conv3 = gcn.GraphConvolution(hidden_layers, hidden_layers)
 
         self.target_graph_2_fea = gcn.Graph_to_Featuremaps(input_channels=input_channels, output_channels=out_channels,
-                                                    hidden_layers=hidden_layers, nodes=n_classes
-                                                    )
+                                                           hidden_layers=hidden_layers, nodes=n_classes
+                                                           )
         self.target_skip_conv = nn.Sequential(*[nn.Conv2d(input_channels, input_channels, kernel_size=1),
-                                         nn.ReLU(True)])
+                                                nn.ReLU(True)])
 
-    def load_source_model(self,state_dict):
+    def load_source_model(self, state_dict):
         own_state = self.state_dict()
         # for name inshop_cos own_state:
         #    print name
@@ -53,9 +55,9 @@ class deeplab_xception_transfer_basemodel(deeplab_xception.DeepLabv3_plus):
             name = name.replace('module.', '')
             if 'graph' in name and 'source' not in name and 'target' not in name and 'fc_graph' not in name and 'transpose_graph' not in name:
                 if 'featuremap_2_graph' in name:
-                    name = name.replace('featuremap_2_graph','source_featuremap_2_graph')
+                    name = name.replace('featuremap_2_graph', 'source_featuremap_2_graph')
                 else:
-                    name = name.replace('graph','source_graph')
+                    name = name.replace('graph', 'source_graph')
             new_state_dict[name] = 0
             if name not in own_state:
                 if 'num_batch' in name:
@@ -105,7 +107,7 @@ class deeplab_xception_transfer_basemodel(deeplab_xception.DeepLabv3_plus):
                 l.append(k)
         return l
 
-    def forward(self, input,adj1_target=None, adj2_source=None,adj3_transfer=None ):
+    def forward(self, input, adj1_target=None, adj2_source=None, adj3_transfer=None):
         x, low_level_features = self.xception_features(input)
         # print(x.size())
         x1 = self.aspp1(x)
@@ -133,7 +135,6 @@ class deeplab_xception_transfer_basemodel(deeplab_xception.DeepLabv3_plus):
 
         ### add graph
 
-
         # target graph
         # print('x size',x.size(),adj1.size())
         graph = self.target_featuremap_2_graph(x)
@@ -160,26 +161,30 @@ class deeplab_xception_transfer_basemodel(deeplab_xception.DeepLabv3_plus):
 
         return x
 
+
 class deeplab_xception_transfer_basemodel_savememory(deeplab_xception.DeepLabv3_plus):
-    def __init__(self,nInputChannels=3, n_classes=7, os=16,input_channels=256,hidden_layers=128,out_channels=256):
-        super(deeplab_xception_transfer_basemodel_savememory, self).__init__(nInputChannels=nInputChannels, n_classes=n_classes,
-                                                                  os=os,)
+    def __init__(self, nInputChannels=3, n_classes=7, os=16, input_channels=256, hidden_layers=128, out_channels=256):
+        super(deeplab_xception_transfer_basemodel_savememory, self).__init__(nInputChannels=nInputChannels,
+                                                                             n_classes=n_classes,
+                                                                             os=os, )
         ### source graph
 
         ### target graph
-        self.target_featuremap_2_graph = gcn.Featuremaps_to_Graph(input_channels=input_channels, hidden_layers=hidden_layers,
-                                                           nodes=n_classes)
+        self.target_featuremap_2_graph = gcn.Featuremaps_to_Graph(input_channels=input_channels,
+                                                                  hidden_layers=hidden_layers,
+                                                                  nodes=n_classes)
         self.target_graph_conv1 = gcn.GraphConvolution(hidden_layers, hidden_layers)
         self.target_graph_conv2 = gcn.GraphConvolution(hidden_layers, hidden_layers)
         self.target_graph_conv3 = gcn.GraphConvolution(hidden_layers, hidden_layers)
 
-        self.target_graph_2_fea = gcn.Graph_to_Featuremaps_savemem(input_channels=input_channels, output_channels=out_channels,
+        self.target_graph_2_fea = gcn.Graph_to_Featuremaps_savemem(input_channels=input_channels,
+                                                                   output_channels=out_channels,
                                                                    hidden_layers=hidden_layers, nodes=n_classes
                                                                    )
         self.target_skip_conv = nn.Sequential(*[nn.Conv2d(input_channels, input_channels, kernel_size=1),
-                                         nn.ReLU(True)])
+                                                nn.ReLU(True)])
 
-    def load_source_model(self,state_dict):
+    def load_source_model(self, state_dict):
         own_state = self.state_dict()
         # for name inshop_cos own_state:
         #    print name
@@ -188,9 +193,9 @@ class deeplab_xception_transfer_basemodel_savememory(deeplab_xception.DeepLabv3_
             name = name.replace('module.', '')
             if 'graph' in name and 'source' not in name and 'target' not in name and 'fc_graph' not in name and 'transpose_graph' not in name:
                 if 'featuremap_2_graph' in name:
-                    name = name.replace('featuremap_2_graph','source_featuremap_2_graph')
+                    name = name.replace('featuremap_2_graph', 'source_featuremap_2_graph')
                 else:
-                    name = name.replace('graph','source_graph')
+                    name = name.replace('graph', 'source_graph')
             new_state_dict[name] = 0
             if name not in own_state:
                 if 'num_batch' in name:
@@ -240,7 +245,7 @@ class deeplab_xception_transfer_basemodel_savememory(deeplab_xception.DeepLabv3_
                 l.append(k)
         return l
 
-    def forward(self, input,adj1_target=None, adj2_source=None,adj3_transfer=None ):
+    def forward(self, input, adj1_target=None, adj2_source=None, adj3_transfer=None):
         x, low_level_features = self.xception_features(input)
         # print(x.size())
         x1 = self.aspp1(x)
@@ -268,7 +273,6 @@ class deeplab_xception_transfer_basemodel_savememory(deeplab_xception.DeepLabv3_
 
         ### add graph
 
-
         # target graph
         # print('x size',x.size(),adj1.size())
         graph = self.target_featuremap_2_graph(x)
@@ -295,10 +299,12 @@ class deeplab_xception_transfer_basemodel_savememory(deeplab_xception.DeepLabv3_
 
         return x
 
+
 class deeplab_xception_transfer_basemodel_synBN(deeplab_xception_synBN.DeepLabv3_plus):
-    def __init__(self,nInputChannels=3, n_classes=7, os=16,input_channels=256,hidden_layers=128,out_channels=256):
-        super(deeplab_xception_transfer_basemodel_synBN, self).__init__(nInputChannels=nInputChannels, n_classes=n_classes,
-                                                                  os=os,)
+    def __init__(self, nInputChannels=3, n_classes=7, os=16, input_channels=256, hidden_layers=128, out_channels=256):
+        super(deeplab_xception_transfer_basemodel_synBN, self).__init__(nInputChannels=nInputChannels,
+                                                                        n_classes=n_classes,
+                                                                        os=os, )
         ### source graph
         # self.source_featuremap_2_graph = gcn.Featuremaps_to_Graph(input_channels=input_channels, hidden_layers=hidden_layers,
         #                                                    nodes=n_classes)
@@ -313,19 +319,20 @@ class deeplab_xception_transfer_basemodel_synBN(deeplab_xception_synBN.DeepLabv3
         #                                  nn.ReLU(True)])
 
         ### target graph
-        self.target_featuremap_2_graph = gcn.Featuremaps_to_Graph(input_channels=input_channels, hidden_layers=hidden_layers,
-                                                           nodes=n_classes)
+        self.target_featuremap_2_graph = gcn.Featuremaps_to_Graph(input_channels=input_channels,
+                                                                  hidden_layers=hidden_layers,
+                                                                  nodes=n_classes)
         self.target_graph_conv1 = gcn.GraphConvolution(hidden_layers, hidden_layers)
         self.target_graph_conv2 = gcn.GraphConvolution(hidden_layers, hidden_layers)
         self.target_graph_conv3 = gcn.GraphConvolution(hidden_layers, hidden_layers)
 
         self.target_graph_2_fea = gcn.Graph_to_Featuremaps(input_channels=input_channels, output_channels=out_channels,
-                                                    hidden_layers=hidden_layers, nodes=n_classes
-                                                    )
+                                                           hidden_layers=hidden_layers, nodes=n_classes
+                                                           )
         self.target_skip_conv = nn.Sequential(*[nn.Conv2d(input_channels, input_channels, kernel_size=1),
-                                         nn.ReLU(True)])
+                                                nn.ReLU(True)])
 
-    def load_source_model(self,state_dict):
+    def load_source_model(self, state_dict):
         own_state = self.state_dict()
         # for name inshop_cos own_state:
         #    print name
@@ -335,9 +342,9 @@ class deeplab_xception_transfer_basemodel_synBN(deeplab_xception_synBN.DeepLabv3
 
             if 'graph' in name and 'source' not in name and 'target' not in name:
                 if 'featuremap_2_graph' in name:
-                    name = name.replace('featuremap_2_graph','source_featuremap_2_graph')
+                    name = name.replace('featuremap_2_graph', 'source_featuremap_2_graph')
                 else:
-                    name = name.replace('graph','source_graph')
+                    name = name.replace('graph', 'source_graph')
             new_state_dict[name] = 0
             if name not in own_state:
                 if 'num_batch' in name:
@@ -387,7 +394,7 @@ class deeplab_xception_transfer_basemodel_synBN(deeplab_xception_synBN.DeepLabv3
                 l.append(k)
         return l
 
-    def forward(self, input,adj1_target=None, adj2_source=None,adj3_transfer=None ):
+    def forward(self, input, adj1_target=None, adj2_source=None, adj3_transfer=None):
         x, low_level_features = self.xception_features(input)
         # print(x.size())
         x1 = self.aspp1(x)
@@ -415,7 +422,6 @@ class deeplab_xception_transfer_basemodel_synBN(deeplab_xception_synBN.DeepLabv3
 
         ### add graph
 
-
         # target graph
         # print('x size',x.size(),adj1.size())
         graph = self.target_featuremap_2_graph(x)
@@ -442,9 +448,11 @@ class deeplab_xception_transfer_basemodel_synBN(deeplab_xception_synBN.DeepLabv3
 
         return x
 
+
 class deeplab_xception_transfer_basemodel_synBN_savememory(deeplab_xception_synBN.DeepLabv3_plus):
-    def __init__(self,nInputChannels=3, n_classes=7, os=16,input_channels=256,hidden_layers=128,out_channels=256):
-        super(deeplab_xception_transfer_basemodel_synBN_savememory, self).__init__(nInputChannels=nInputChannels, n_classes=n_classes,
+    def __init__(self, nInputChannels=3, n_classes=7, os=16, input_channels=256, hidden_layers=128, out_channels=256):
+        super(deeplab_xception_transfer_basemodel_synBN_savememory, self).__init__(nInputChannels=nInputChannels,
+                                                                                   n_classes=n_classes,
                                                                                    os=os, )
         ### source graph
         # self.source_featuremap_2_graph = gcn.Featuremaps_to_Graph(input_channels=input_channels, hidden_layers=hidden_layers,
@@ -460,20 +468,22 @@ class deeplab_xception_transfer_basemodel_synBN_savememory(deeplab_xception_synB
         #                                  nn.ReLU(True)])
 
         ### target graph
-        self.target_featuremap_2_graph = gcn.Featuremaps_to_Graph(input_channels=input_channels, hidden_layers=hidden_layers,
-                                                           nodes=n_classes)
+        self.target_featuremap_2_graph = gcn.Featuremaps_to_Graph(input_channels=input_channels,
+                                                                  hidden_layers=hidden_layers,
+                                                                  nodes=n_classes)
         self.target_graph_conv1 = gcn.GraphConvolution(hidden_layers, hidden_layers)
         self.target_graph_conv2 = gcn.GraphConvolution(hidden_layers, hidden_layers)
         self.target_graph_conv3 = gcn.GraphConvolution(hidden_layers, hidden_layers)
 
-        self.target_graph_2_fea = gcn.Graph_to_Featuremaps_savemem(input_channels=input_channels, output_channels=out_channels,
+        self.target_graph_2_fea = gcn.Graph_to_Featuremaps_savemem(input_channels=input_channels,
+                                                                   output_channels=out_channels,
                                                                    hidden_layers=hidden_layers, nodes=n_classes
                                                                    )
         self.target_skip_conv = nn.Sequential(*[nn.Conv2d(input_channels, input_channels, kernel_size=1),
                                                 nn.BatchNorm2d(input_channels),
                                                 nn.ReLU(True)])
 
-    def load_source_model(self,state_dict):
+    def load_source_model(self, state_dict):
         own_state = self.state_dict()
         # for name inshop_cos own_state:
         #    print name
@@ -483,9 +493,9 @@ class deeplab_xception_transfer_basemodel_synBN_savememory(deeplab_xception_synB
 
             if 'graph' in name and 'source' not in name and 'target' not in name:
                 if 'featuremap_2_graph' in name:
-                    name = name.replace('featuremap_2_graph','source_featuremap_2_graph')
+                    name = name.replace('featuremap_2_graph', 'source_featuremap_2_graph')
                 else:
-                    name = name.replace('graph','source_graph')
+                    name = name.replace('graph', 'source_graph')
             new_state_dict[name] = 0
             if name not in own_state:
                 if 'num_batch' in name:
@@ -535,7 +545,7 @@ class deeplab_xception_transfer_basemodel_synBN_savememory(deeplab_xception_synB
                 l.append(k)
         return l
 
-    def forward(self, input,adj1_target=None, adj2_source=None,adj3_transfer=None ):
+    def forward(self, input, adj1_target=None, adj2_source=None, adj3_transfer=None):
         x, low_level_features = self.xception_features(input)
         # print(x.size())
         x1 = self.aspp1(x)
@@ -563,7 +573,6 @@ class deeplab_xception_transfer_basemodel_synBN_savememory(deeplab_xception_synB
 
         ### add graph
 
-
         # target graph
         # print('x size',x.size(),adj1.size())
         graph = self.target_featuremap_2_graph(x)
@@ -590,26 +599,30 @@ class deeplab_xception_transfer_basemodel_synBN_savememory(deeplab_xception_synB
 
         return x
 
+
 #######################
 # transfer model
 #######################
 
 class deeplab_xception_transfer_projection(deeplab_xception_transfer_basemodel):
-    def __init__(self, nInputChannels=3, n_classes=7, os=16,input_channels=256,hidden_layers=128,out_channels=256,
+    def __init__(self, nInputChannels=3, n_classes=7, os=16, input_channels=256, hidden_layers=128, out_channels=256,
                  transfer_graph=None, source_classes=20):
         super(deeplab_xception_transfer_projection, self).__init__(nInputChannels=nInputChannels, n_classes=n_classes,
                                                                    os=os, input_channels=input_channels,
-                                                                   hidden_layers=hidden_layers, out_channels=out_channels, )
-        self.source_featuremap_2_graph = gcn.Featuremaps_to_Graph(input_channels=input_channels, hidden_layers=hidden_layers,
-                                                           nodes=source_classes)
+                                                                   hidden_layers=hidden_layers,
+                                                                   out_channels=out_channels, )
+        self.source_featuremap_2_graph = gcn.Featuremaps_to_Graph(input_channels=input_channels,
+                                                                  hidden_layers=hidden_layers,
+                                                                  nodes=source_classes)
         self.source_graph_conv1 = gcn.GraphConvolution(hidden_layers, hidden_layers)
         self.source_graph_conv2 = gcn.GraphConvolution(hidden_layers, hidden_layers)
         self.source_graph_conv3 = gcn.GraphConvolution(hidden_layers, hidden_layers)
-        self.transpose_graph = gcn.Graph_trans(in_features=hidden_layers,out_features=hidden_layers,adj=transfer_graph,
-                                               begin_nodes=source_classes,end_nodes=n_classes)
-        self.fc_graph = gcn.GraphConvolution(hidden_layers*3, hidden_layers)
+        self.transpose_graph = gcn.Graph_trans(in_features=hidden_layers, out_features=hidden_layers,
+                                               adj=transfer_graph,
+                                               begin_nodes=source_classes, end_nodes=n_classes)
+        self.fc_graph = gcn.GraphConvolution(hidden_layers * 3, hidden_layers)
 
-    def forward(self, input,adj1_target=None, adj2_source=None,adj3_transfer=None ):
+    def forward(self, input, adj1_target=None, adj2_source=None, adj3_transfer=None):
         x, low_level_features = self.xception_features(input)
         # print(x.size())
         x1 = self.aspp1(x)
@@ -638,7 +651,7 @@ class deeplab_xception_transfer_projection(deeplab_xception_transfer_basemodel):
         ### add graph
         # source graph
         source_graph = self.source_featuremap_2_graph(x)
-        source_graph1 = self.source_graph_conv1.forward(source_graph,adj=adj2_source, relu=True)
+        source_graph1 = self.source_graph_conv1.forward(source_graph, adj=adj2_source, relu=True)
         source_graph2 = self.source_graph_conv2.forward(source_graph1, adj=adj2_source, relu=True)
         source_graph3 = self.source_graph_conv2.forward(source_graph2, adj=adj2_source, relu=True)
 
@@ -655,8 +668,8 @@ class deeplab_xception_transfer_projection(deeplab_xception_transfer_basemodel):
         # print(graph.size())
         # print(source_2_target_graph1.size())
         # print(source_2_target_graph1_v5.size())
-        graph = torch.cat((graph,source_2_target_graph1.squeeze(0), source_2_target_graph1_v5.squeeze(0)),dim=-1)
-        graph = self.fc_graph.forward(graph,relu=True)
+        graph = torch.cat((graph, source_2_target_graph1.squeeze(0), source_2_target_graph1_v5.squeeze(0)), dim=-1)
+        graph = self.fc_graph.forward(graph, relu=True)
 
         graph = self.target_graph_conv1.forward(graph, adj=adj1_target, relu=True)
 
@@ -686,12 +699,12 @@ class deeplab_xception_transfer_projection(deeplab_xception_transfer_basemodel):
 
         return x
 
-    def similarity_trans(self,source,target):
+    def similarity_trans(self, source, target):
         sim = torch.matmul(F.normalize(target, p=2, dim=-1), F.normalize(source, p=2, dim=-1).transpose(-1, -2))
         sim = F.softmax(sim, dim=-1)
         return torch.matmul(sim, source)
 
-    def load_source_model(self,state_dict):
+    def load_source_model(self, state_dict):
         own_state = self.state_dict()
         # for name inshop_cos own_state:
         #    print name
@@ -701,9 +714,9 @@ class deeplab_xception_transfer_projection(deeplab_xception_transfer_basemodel):
 
             if 'graph' in name and 'source' not in name and 'target' not in name and 'fc_' not in name and 'transpose_graph' not in name:
                 if 'featuremap_2_graph' in name:
-                    name = name.replace('featuremap_2_graph','source_featuremap_2_graph')
+                    name = name.replace('featuremap_2_graph', 'source_featuremap_2_graph')
                 else:
-                    name = name.replace('graph','source_graph')
+                    name = name.replace('graph', 'source_graph')
             new_state_dict[name] = 0
             if name not in own_state:
                 if 'num_batch' in name:
@@ -729,22 +742,27 @@ class deeplab_xception_transfer_projection(deeplab_xception_transfer_basemodel):
         if len(missing) > 0:
             print('missing keys in state_dict: "{}"'.format(missing))
 
+
 class deeplab_xception_transfer_projection_savemem(deeplab_xception_transfer_basemodel_savememory):
-    def __init__(self, nInputChannels=3, n_classes=7, os=16,input_channels=256,hidden_layers=128,out_channels=256,
+    def __init__(self, nInputChannels=3, n_classes=7, os=16, input_channels=256, hidden_layers=128, out_channels=256,
                  transfer_graph=None, source_classes=20):
-        super(deeplab_xception_transfer_projection_savemem, self).__init__(nInputChannels=nInputChannels, n_classes=n_classes,
+        super(deeplab_xception_transfer_projection_savemem, self).__init__(nInputChannels=nInputChannels,
+                                                                           n_classes=n_classes,
                                                                            os=os, input_channels=input_channels,
-                                                                           hidden_layers=hidden_layers, out_channels=out_channels, )
-        self.source_featuremap_2_graph = gcn.Featuremaps_to_Graph(input_channels=input_channels, hidden_layers=hidden_layers,
-                                                           nodes=source_classes)
+                                                                           hidden_layers=hidden_layers,
+                                                                           out_channels=out_channels, )
+        self.source_featuremap_2_graph = gcn.Featuremaps_to_Graph(input_channels=input_channels,
+                                                                  hidden_layers=hidden_layers,
+                                                                  nodes=source_classes)
         self.source_graph_conv1 = gcn.GraphConvolution(hidden_layers, hidden_layers)
         self.source_graph_conv2 = gcn.GraphConvolution(hidden_layers, hidden_layers)
         self.source_graph_conv3 = gcn.GraphConvolution(hidden_layers, hidden_layers)
-        self.transpose_graph = gcn.Graph_trans(in_features=hidden_layers,out_features=hidden_layers,adj=transfer_graph,
-                                               begin_nodes=source_classes,end_nodes=n_classes)
-        self.fc_graph = gcn.GraphConvolution(hidden_layers*3, hidden_layers)
+        self.transpose_graph = gcn.Graph_trans(in_features=hidden_layers, out_features=hidden_layers,
+                                               adj=transfer_graph,
+                                               begin_nodes=source_classes, end_nodes=n_classes)
+        self.fc_graph = gcn.GraphConvolution(hidden_layers * 3, hidden_layers)
 
-    def forward(self, input,adj1_target=None, adj2_source=None,adj3_transfer=None ):
+    def forward(self, input, adj1_target=None, adj2_source=None, adj3_transfer=None):
         x, low_level_features = self.xception_features(input)
         # print(x.size())
         x1 = self.aspp1(x)
@@ -773,7 +791,7 @@ class deeplab_xception_transfer_projection_savemem(deeplab_xception_transfer_bas
         ### add graph
         # source graph
         source_graph = self.source_featuremap_2_graph(x)
-        source_graph1 = self.source_graph_conv1.forward(source_graph,adj=adj2_source, relu=True)
+        source_graph1 = self.source_graph_conv1.forward(source_graph, adj=adj2_source, relu=True)
         source_graph2 = self.source_graph_conv2.forward(source_graph1, adj=adj2_source, relu=True)
         source_graph3 = self.source_graph_conv2.forward(source_graph2, adj=adj2_source, relu=True)
 
@@ -787,8 +805,8 @@ class deeplab_xception_transfer_projection_savemem(deeplab_xception_transfer_bas
 
         source_2_target_graph1 = self.similarity_trans(source_graph1, graph)
         # graph combine 1
-        graph = torch.cat((graph,source_2_target_graph1.squeeze(0), source_2_target_graph1_v5.squeeze(0)),dim=-1)
-        graph = self.fc_graph.forward(graph,relu=True)
+        graph = torch.cat((graph, source_2_target_graph1.squeeze(0), source_2_target_graph1_v5.squeeze(0)), dim=-1)
+        graph = self.fc_graph.forward(graph, relu=True)
 
         graph = self.target_graph_conv1.forward(graph, adj=adj1_target, relu=True)
 
@@ -818,12 +836,12 @@ class deeplab_xception_transfer_projection_savemem(deeplab_xception_transfer_bas
 
         return x
 
-    def similarity_trans(self,source,target):
+    def similarity_trans(self, source, target):
         sim = torch.matmul(F.normalize(target, p=2, dim=-1), F.normalize(source, p=2, dim=-1).transpose(-1, -2))
         sim = F.softmax(sim, dim=-1)
         return torch.matmul(sim, source)
 
-    def load_source_model(self,state_dict):
+    def load_source_model(self, state_dict):
         own_state = self.state_dict()
         # for name inshop_cos own_state:
         #    print name
@@ -833,9 +851,9 @@ class deeplab_xception_transfer_projection_savemem(deeplab_xception_transfer_bas
 
             if 'graph' in name and 'source' not in name and 'target' not in name and 'fc_' not in name and 'transpose_graph' not in name:
                 if 'featuremap_2_graph' in name:
-                    name = name.replace('featuremap_2_graph','source_featuremap_2_graph')
+                    name = name.replace('featuremap_2_graph', 'source_featuremap_2_graph')
                 else:
-                    name = name.replace('graph','source_graph')
+                    name = name.replace('graph', 'source_graph')
             new_state_dict[name] = 0
             if name not in own_state:
                 if 'num_batch' in name:
@@ -863,21 +881,25 @@ class deeplab_xception_transfer_projection_savemem(deeplab_xception_transfer_bas
 
 
 class deeplab_xception_transfer_projection_synBN_savemem(deeplab_xception_transfer_basemodel_synBN_savememory):
-    def __init__(self, nInputChannels=3, n_classes=7, os=16,input_channels=256,hidden_layers=128,out_channels=256,
+    def __init__(self, nInputChannels=3, n_classes=7, os=16, input_channels=256, hidden_layers=128, out_channels=256,
                  transfer_graph=None, source_classes=20):
-        super(deeplab_xception_transfer_projection_synBN_savemem, self).__init__(nInputChannels=nInputChannels, n_classes=n_classes,
+        super(deeplab_xception_transfer_projection_synBN_savemem, self).__init__(nInputChannels=nInputChannels,
+                                                                                 n_classes=n_classes,
                                                                                  os=os, input_channels=input_channels,
-                                                                                 hidden_layers=hidden_layers, out_channels=out_channels, )
-        self.source_featuremap_2_graph = gcn.Featuremaps_to_Graph(input_channels=input_channels, hidden_layers=hidden_layers,
-                                                           nodes=source_classes)
+                                                                                 hidden_layers=hidden_layers,
+                                                                                 out_channels=out_channels, )
+        self.source_featuremap_2_graph = gcn.Featuremaps_to_Graph(input_channels=input_channels,
+                                                                  hidden_layers=hidden_layers,
+                                                                  nodes=source_classes)
         self.source_graph_conv1 = gcn.GraphConvolution(hidden_layers, hidden_layers)
         self.source_graph_conv2 = gcn.GraphConvolution(hidden_layers, hidden_layers)
         self.source_graph_conv3 = gcn.GraphConvolution(hidden_layers, hidden_layers)
-        self.transpose_graph = gcn.Graph_trans(in_features=hidden_layers,out_features=hidden_layers,adj=transfer_graph,
-                                               begin_nodes=source_classes,end_nodes=n_classes)
-        self.fc_graph = gcn.GraphConvolution(hidden_layers*3 ,hidden_layers)
+        self.transpose_graph = gcn.Graph_trans(in_features=hidden_layers, out_features=hidden_layers,
+                                               adj=transfer_graph,
+                                               begin_nodes=source_classes, end_nodes=n_classes)
+        self.fc_graph = gcn.GraphConvolution(hidden_layers * 3, hidden_layers)
 
-    def forward(self, input,adj1_target=None, adj2_source=None,adj3_transfer=None ):
+    def forward(self, input, adj1_target=None, adj2_source=None, adj3_transfer=None):
         x, low_level_features = self.xception_features(input)
         # print(x.size())
         x1 = self.aspp1(x)
@@ -906,7 +928,7 @@ class deeplab_xception_transfer_projection_synBN_savemem(deeplab_xception_transf
         ### add graph
         # source graph
         source_graph = self.source_featuremap_2_graph(x)
-        source_graph1 = self.source_graph_conv1.forward(source_graph,adj=adj2_source, relu=True)
+        source_graph1 = self.source_graph_conv1.forward(source_graph, adj=adj2_source, relu=True)
         source_graph2 = self.source_graph_conv2.forward(source_graph1, adj=adj2_source, relu=True)
         source_graph3 = self.source_graph_conv2.forward(source_graph2, adj=adj2_source, relu=True)
 
@@ -920,8 +942,8 @@ class deeplab_xception_transfer_projection_synBN_savemem(deeplab_xception_transf
 
         source_2_target_graph1 = self.similarity_trans(source_graph1, graph)
         # graph combine 1
-        graph = torch.cat((graph,source_2_target_graph1.squeeze(0), source_2_target_graph1_v5.squeeze(0)),dim=-1)
-        graph = self.fc_graph.forward(graph,relu=True)
+        graph = torch.cat((graph, source_2_target_graph1.squeeze(0), source_2_target_graph1_v5.squeeze(0)), dim=-1)
+        graph = self.fc_graph.forward(graph, relu=True)
 
         graph = self.target_graph_conv1.forward(graph, adj=adj1_target, relu=True)
 
@@ -951,12 +973,12 @@ class deeplab_xception_transfer_projection_synBN_savemem(deeplab_xception_transf
 
         return x
 
-    def similarity_trans(self,source,target):
+    def similarity_trans(self, source, target):
         sim = torch.matmul(F.normalize(target, p=2, dim=-1), F.normalize(source, p=2, dim=-1).transpose(-1, -2))
         sim = F.softmax(sim, dim=-1)
         return torch.matmul(sim, source)
 
-    def load_source_model(self,state_dict):
+    def load_source_model(self, state_dict):
         own_state = self.state_dict()
         # for name inshop_cos own_state:
         #    print name
@@ -966,9 +988,9 @@ class deeplab_xception_transfer_projection_synBN_savemem(deeplab_xception_transf
 
             if 'graph' in name and 'source' not in name and 'target' not in name and 'fc_' not in name and 'transpose_graph' not in name:
                 if 'featuremap_2_graph' in name:
-                    name = name.replace('featuremap_2_graph','source_featuremap_2_graph')
+                    name = name.replace('featuremap_2_graph', 'source_featuremap_2_graph')
                 else:
-                    name = name.replace('graph','source_graph')
+                    name = name.replace('graph', 'source_graph')
             new_state_dict[name] = 0
             if name not in own_state:
                 if 'num_batch' in name:
@@ -994,10 +1016,9 @@ class deeplab_xception_transfer_projection_synBN_savemem(deeplab_xception_transf
         if len(missing) > 0:
             print('missing keys in state_dict: "{}"'.format(missing))
 
-
 # if __name__ == '__main__':
-    # net = deeplab_xception_transfer_projection_v3v5_more_savemem()
-    # img = torch.rand((2,3,128,128))
-    # net.eval()
-    # a = torch.rand((1,1,7,7))
-    # net.forward(img, adj1_target=a)
+# net = deeplab_xception_transfer_projection_v3v5_more_savemem()
+# img = torch.rand((2,3,128,128))
+# net.eval()
+# a = torch.rand((1,1,7,7))
+# net.forward(img, adj1_target=a)

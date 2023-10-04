@@ -5,7 +5,7 @@ import torch.nn.functional as F
 
 from collections import OrderedDict
 from torch.nn import Parameter
-from networks import deeplab_xception, gcn, deeplab_xception_synBN
+from . import deeplab_xception, gcn, deeplab_xception_synBN
 
 
 

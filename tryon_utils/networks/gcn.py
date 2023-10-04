@@ -3,7 +3,7 @@ import torch
 from torch.nn.parameter import Parameter
 import torch.nn as nn
 import torch.nn.functional as F
-from networks import graph
+from . import graph
 # import pdb
 
 class GraphConvolution(nn.Module):

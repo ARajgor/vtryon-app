@@ -178,7 +178,7 @@ class CPDataset(data.Dataset):
         agnostic = torch.cat([shape, im_h, pose_map], 0)
 
         if self.stage == 'GMM':
-            im_g = Image.open('data/grid.png')
+            im_g = Image.open('static/data/grid.png')
             im_g = self.transform(im_g)
         else:
             im_g = ''

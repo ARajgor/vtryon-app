@@ -21,9 +21,9 @@ def get_opt():
 
     parser.add_argument("--gpu_ids", default="")
     parser.add_argument('-j', '--workers', type=int, default=1)
-    parser.add_argument('-b', '--batch-size', type=int, default=4)
+    parser.add_argument('-b', '--batch-size', type=int, default=2)
 
-    parser.add_argument("--dataroot", default="data")
+    parser.add_argument("--dataroot", default="static/data")
 
     # parser.add_argument("--datamode", default="train")
     parser.add_argument("--datamode", default="test")
@@ -46,8 +46,8 @@ def get_opt():
     parser.add_argument('--result_dir', type=str,
                         default='static/result', help='save result infos')
 
-    parser.add_argument('--checkpoint', type=str, default='checkpoints/GMM/gmm_final.pth', help='model checkpoint for test')
-    # parser.add_argument('--checkpoint', type=str, default='checkpoints/TOM/tom_final.pth', help='model checkpoint for test')
+    parser.add_argument('--checkpoint', type=str, default='checkpoints/GMM/gmm_final.pth',
+                        help='model checkpoint for input')
 
     parser.add_argument("--display_count", type=int, default=1)
     parser.add_argument("--shuffle", action='store_true',
@@ -148,7 +148,7 @@ def test_tom(opt, test_loader, model, board):
         os.makedirs(shape_dir)
     im_h_dir = os.path.join(save_dir, 'im_h')
     if not os.path.exists(im_h_dir):
-        os.makedirs(im_h_dir)  # for test data
+        os.makedirs(im_h_dir)  # for input data
 
     print('Dataset size: %05d!' % (len(test_loader.dataset)), flush=True)
     for step, inputs in enumerate(test_loader.data_loader):
@@ -180,7 +180,7 @@ def test_tom(opt, test_loader, model, board):
         save_images(shape, im_names, shape_dir)
         save_images(im_pose, im_names, im_pose_dir)
         save_images(m_composite, im_names, m_composite_dir)
-        save_images(p_rendered, im_names, p_rendered_dir)  # For test data
+        save_images(p_rendered, im_names, p_rendered_dir)  # For input data
 
         if (step+1) % opt.display_count == 0:
             board_add_images(board, 'combine', visuals, step+1)
@@ -191,7 +191,7 @@ def test_tom(opt, test_loader, model, board):
 def main():
     opt = get_opt()
     print(opt)
-    print("Start to test stage: %s, named: %s!" % (opt.stage, opt.name))
+    print("Start to input stage: %s, named: %s!" % (opt.stage, opt.name))
 
     # create dataset
     test_dataset = CPDataset(opt)
@@ -204,7 +204,7 @@ def main():
         os.makedirs(opt.tensorboard_dir)
     board = SummaryWriter(logdir=os.path.join(opt.tensorboard_dir, opt.name))
 
-    # create model & test
+    # create model & input
     if opt.stage == 'GMM':
         model = GMM(opt)
         load_checkpoint(model, opt.checkpoint)
@@ -219,7 +219,7 @@ def main():
     else:
         raise NotImplementedError('Model [%s] is not implemented' % opt.stage)
 
-    print('Finished test %s, named: %s!' % (opt.stage, opt.name))
+    print('Finished input %s, named: %s!' % (opt.stage, opt.name))
 
 
 if __name__ == "__main__":
