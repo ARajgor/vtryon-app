@@ -78,7 +78,7 @@ def upload():
         generate_pose_keypoints(main_dir, filename_person)
 
         # ..... Write input sample pair txt file ..... #
-        with open("static/test_samples_pair.txt", "w") as text_file:
+        with open("static/data/test_samples_pair.txt", "w") as text_file:
             text_file.write(str(filename_person) + " " + str(filename_cloth))
 
         # ..... Run Geometric Matching Module(GMM) Model ..... #

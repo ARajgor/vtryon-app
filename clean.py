@@ -8,8 +8,9 @@ def clean_data():
     dir = os.path.join(main_dir, "static/data/input")
     for folder in os.listdir(dir):
         folder = os.path.join(dir, folder)
-        for file in os.listdir(folder):
-            os.remove(os.path.join(folder, file))
+        if os.path.isdir(folder):
+            for file in os.listdir(folder):
+                os.remove(os.path.join(folder, file))
 
     dir2 = os.path.join(main_dir, "static\\result")
     for folder in os.listdir(dir2):
