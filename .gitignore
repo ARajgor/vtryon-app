@@ -9,4 +9,5 @@ log/*
 *.pyc
 *.zip
 venv
+venv-cuda
 .gitignore

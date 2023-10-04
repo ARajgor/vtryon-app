@@ -1,32 +1,39 @@
 # cp-VTryon-plus-Flask-App
 
-Flask App version of https://github.com/minar09/cp-vton-plus (**CPU** based) for **custom images**
+Flask App version of https://github.com/minar09/cp-vton-plus
 
-New version of https://github.com/vinodbukya6/cp-VTryon-plus-Flask-App **@vinodbukya6**
-
-it is CPU based. on intel 4 core 8 thread 10th gen i7 it take 30 sec to produce output.
+**Master branch is for cuda based version,
+cpu branch is for cpu based version.**
 
 if you find any problem feel free to raise issue.
-# what's new 
-- code is tested on new version of torch=1.13.1, torchvision=0.14.1 and opencv=4.5.5.64 using with python 3.9 pip installation.
+
+## what's new [Oct 2023]
+- Python 3.11 support
+- Supporting new version of torch and torchvision.
+  - torch = 2.0.1
+  - torchvision = 0.15
+  - opencv = 4.8.1.78
 - fix all the deprecated warning of torch and resolve all isuses regarding dependency.
 - now you can upload .JPG, .png/.PNG and .jpeg/.JPEG files. (resolve the .jpg dependency).
 - showing both images on result page. original and result.
 
-**Installation**
+### Installation
 
-run pip install -r requirements.txt
+**For cuda version (GPU), install torch with cuda [Here.](https://1drv.ms/u/s!Ai8t8GAHdzVUiQA-o3C7cnrfGN6O?e=EaRiFP)**
+**Remove torch and torchvision from requirements.txt and install it manually.**
 
-**Pretrained Models**
+`pip install -r requirements.txt`
 
-Download pretrained models and paste in folder "tryon_utils/checkpoints/"
+`python application.py`
 
-Tryon(GMM & TOM)Models (checkpoints/GMM/) (checkpoints/TOM/) - https://1drv.ms/u/s!Ai8t8GAHdzVUiQA-o3C7cnrfGN6O?e=EaRiFP
 
-Graphonomy(inference.pth) (checkpoints/) - https://drive.google.com/uc?id=1eUe18HoH05p0yFUd_sN6GXdTj82aW0m9
+### Pretrained Models
 
-OpenPose (checkpoints/) - http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel
+Download the these models and paste in folder "tryon_utils/checkpoints/"
 
-**Testing**
-
-Run "python app.py"
+- Tryon [Models](https://1drv.ms/u/s!Ai8t8GAHdzVUiQA-o3C7cnrfGN6O?e=EaRiFP) 
+  - paste in checkpoints/GMM and checkpoints/TOM
+- Graphonomy [inference.pth](https://drive.google.com/uc?id=1eUe18HoH05p0yFUd_sN6GXdTj82aW0m9)
+  - paste in checkpoints/ 
+- OpenPose [model](http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel)
+  - paste in checkpoints/
